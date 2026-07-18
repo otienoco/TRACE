@@ -1,6 +1,7 @@
 """
-Local PubMedBERT classifier — replaces Claude API calls.
+Local BiomedBERT classifier for TRACE — replaces Claude API calls.
 Runs on your server, free, fast, no API key needed.
+Model weights are downloaded automatically from Hugging Face on first run.
 """
 import os
 import torch
@@ -8,7 +9,8 @@ from torch import nn
 from transformers import AutoTokenizer, AutoModel
 from ..schemas import EvidenceClassification
 
-MODEL_DIR = "models/pubmedbert_drug_gene"
+MODEL_DIR        = "models/pubmedbert_drug_gene"
+HF_REPO_ID       = "otienoco/TRACE-classifier"
 
 MECHANISM_LABELS = [
     "inhibitor", "antagonist", "agonist", "activator",
@@ -41,15 +43,40 @@ _model     = None
 _tokenizer = None
 _device    = None
 
+def _download_model():
+    """Download model weights from Hugging Face if not present locally."""
+    best_model_path = os.path.join(MODEL_DIR, "best_model")
+    state_path      = os.path.join(MODEL_DIR, "best_model_state.pt")
+    if os.path.exists(best_model_path) and os.path.exists(state_path):
+        return True
+    print(f"[classify_local] Model not found locally. Downloading from Hugging Face ({HF_REPO_ID})...")
+    try:
+        from huggingface_hub import snapshot_download, hf_hub_download
+        os.makedirs(best_model_path, exist_ok=True)
+        # Download best_model folder
+        snapshot_download(
+            repo_id=HF_REPO_ID,
+            repo_type="model",
+            local_dir=MODEL_DIR,
+            allow_patterns=["best_model/*", "best_model_state.pt"]
+        )
+        print(f"[classify_local] Download complete.")
+        return True
+    except Exception as e:
+        print(f"[classify_local] Download failed: {e}")
+        print(f"[classify_local] Please download manually from https://huggingface.co/{HF_REPO_ID}")
+        return False
+
 def _load_model():
     global _model, _tokenizer, _device
     if _model is not None:
         return
     best_model_path = os.path.join(MODEL_DIR, "best_model")
     state_path      = os.path.join(MODEL_DIR, "best_model_state.pt")
-    if not os.path.exists(best_model_path):
-        print(f"[classify_local] Model not found at {best_model_path}")
-        return
+    if not os.path.exists(best_model_path) or not os.path.exists(state_path):
+        success = _download_model()
+        if not success:
+            return
     print(f"[classify_local] Loading local model...")
     _device    = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     _tokenizer = AutoTokenizer.from_pretrained(best_model_path)
