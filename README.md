@@ -60,6 +60,7 @@ Get a free NCBI API key at: https://www.ncbi.nlm.nih.gov/account/
 
 ## Usage
 
+### Single gene
 ```bash
 python scripts/run_gene.py \
   --gene PTGER4 \
@@ -68,10 +69,40 @@ python scripts/run_gene.py \
   --use_local true
 ```
 
-### Risk direction options
+### Batch run (multiple genes)
+Risk directions must be supplied by the user based on the sign of the effect estimate from their TWAS or S-PrediXcan output. A positive effect estimate corresponds to increased_gene_increases_risk and a negative effect estimate corresponds to decreased_gene_increases_risk.
 
-- `increased_gene_increases_risk` — higher expression raises disease risk; pipeline looks for inhibitors/downregulators
-- `decreased_gene_increases_risk` — lower expression raises disease risk; pipeline looks for activators/upregulators
+```bash
+# TRACE batch run
+# Replace gene symbols below with your own gene lists
+# grouped by TWAS effect direction
+
+DISEASE="hypertension"  # change to your disease name
+
+# GROUP 1: Genes where INCREASED expression increases disease risk
+# positive beta/effect size from S-PrediXcan or TWAS
+for GENE in GENE_A GENE_B GENE_C; do
+    python scripts/run_gene.py \
+      --gene $GENE \
+      --disease "$DISEASE" \
+      --risk_direction increased_gene_increases_risk \
+      --use_local true
+done
+
+# GROUP 2: Genes where DECREASED expression increases disease risk
+# negative beta/effect size from S-PrediXcan or TWAS
+for GENE in GENE_D GENE_E GENE_F; do
+    python scripts/run_gene.py \
+      --gene $GENE \
+      --disease "$DISEASE" \
+      --risk_direction decreased_gene_increases_risk \
+      --use_local true
+done
+```
+
+### Risk direction options
+- `increased_gene_increases_risk` — positive beta from TWAS/S-PrediXcan; pipeline looks for inhibitors/downregulators
+- `decreased_gene_increases_risk` — negative beta from TWAS/S-PrediXcan; pipeline looks for activators/upregulators 
 
 ### Output
 
