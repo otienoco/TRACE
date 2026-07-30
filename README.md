@@ -67,6 +67,8 @@ The fine-tuned BiomedBERT classifier weights are hosted on Hugging Face and will
 
 Model repository: https://huggingface.co/otienoco/TRACE-classifier
 
+**Note for HPC users:** If running on a cluster where compute nodes do not have internet access, download the model weights once on a login node that has internet access by running `python -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='otienoco/TRACE-classifier', local_dir='models/pubmedbert_drug_gene')"` before submitting jobs.
+
 ## API Keys
 
 TRACE uses the NCBI E-utilities API for PubMed retrieval. A free NCBI API key increases your rate limit and is recommended for large gene lists.
