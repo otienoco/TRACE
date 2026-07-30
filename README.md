@@ -6,10 +6,9 @@ TRACE is a gene-agnostic computational pipeline that automates the translation o
 
 If you use TRACE in your research, please cite:
 
-> Otieno CO, Seagle HM, Guare L, Setia-Verma S, Velez Edwards DR, Edwards TL.
-> TRACE: A fine-tuned biomedical language model for directionally informed drug
-> repurposing from transcriptome-wide association studies. 2026. Preprint.
-
+> Otieno CO, Seagle HM, Akerele AT, Jaworski J, Guare L, Setia-Verma S, Velez Edwards DR, Edwards TL.
+> TRACE: A fine-tuned biomedical language model for directionally informed drug repurposing
+> from transcriptome-wide association studies. 2026. Preprint.
 
 ## Requirements
 
