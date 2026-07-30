@@ -29,14 +29,37 @@ pip install -r requirements.txt
 
 TRACE requires one external data file from the Comparative Toxicogenomics Database (CTD):
 
-1. Go to https://ctdbase.org/downloads/
-2. Download **CTD_chem_gene_ixns.tsv.gz**
-3. Place it at `data/raw/CTD_chem_gene_ixns.tsv.gz`
-
+1. Download directly using this command:
 ```bash
 mkdir -p data/raw
-# move the downloaded file to data/raw/CTD_chem_gene_ixns.tsv.gz
+wget -O data/raw/CTD_chem_gene_ixns.tsv.gz "https://ctdbase.org/reports/CTD_chem_gene_ixns.tsv.gz"
 ```
+
+Or manually download from https://ctdbase.org/downloads/ — look for **Chemical-gene interactions** and place the file at `data/raw/CTD_chem_gene_ixns.tsv.gz`
+
+## Installation
+
+```bash
+git clone https://github.com/otienoco/TRACE.git
+cd TRACE
+conda create -n trace python=3.11
+conda activate trace
+pip install .
+```
+
+## Verify Installation
+
+Run this to confirm everything is working before running your full gene list:
+
+```bash
+python scripts/run_gene.py \
+  --gene PTGER4 \
+  --disease "endometriosis" \
+  --risk_direction increased_gene_increases_risk \
+  --use_local true
+```
+
+This should complete in 10-20 minutes and create output files in `results/endometriosis/`. The first run will automatically download the model weights from Hugging Face (~2.6GB) so allow extra time.
 
 ## Model Weights
 
