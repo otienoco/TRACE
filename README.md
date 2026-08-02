@@ -128,6 +128,26 @@ done
 - `increased_gene_increases_risk` — positive beta from TWAS/S-PrediXcan; pipeline looks for inhibitors/downregulators
 - `decreased_gene_increases_risk` — negative beta from TWAS/S-PrediXcan; pipeline looks for activators/upregulators 
 
+
+### Assigning risk directions from TWAS or S-PrediXcan output
+
+TRACE requires one direction per gene. Before running TRACE, users must assign each gene to either increased_gene_increases_risk or decreased_gene_increases_risk based on their TWAS or S-PrediXcan results. Here is how we recommend handling common scenarios:
+
+If your phenotype has multiple related traits (e.g. systolic vs diastolic blood pressure):
+Run TRACE separately for each trait. A gene may have opposing effects depending on the trait, and pooling across traits will produce incorrect direction assignments.
+
+If you have colocalization results (recommended):
+
+Identify the tissue with the highest colocalization posterior probability (PP4) that exceeds your threshold (e.g. PP4 > 0.60). Use that tissue's S-PrediXcan effect estimate sign to assign direction — a positive beta means increased_gene_increases_risk and a negative beta means decreased_gene_increases_risk.
+If colocalization is similar across tissues, use the most biologically relevant tissue for your trait (e.g. aorta or heart for blood pressure, uterus for endometriosis).
+If effects are split across tissues and no tissue has a colocalization posterior probability above your threshold (e.g. PP4 > 0.60), exclude the gene and flag it for manual review.
+
+If you do not have colocalization results:
+Assign direction based on the majority effect sign across tissues from your S-PrediXcan output. If the majority of significant tissues show a positive beta, assign increased_gene_increases_risk. If the majority show a negative beta, assign decreased_gene_increases_risk. Genes with an equal split should be excluded.
+
+Note that without colocalization support, some TWAS signals may reflect linkage disequilibrium rather than true causal gene expression effects. Candidates generated from genes without colocalization support should be interpreted with extra caution and prioritized below those with strong colocalization evidence.
+
+
 ### Output
 
 Results are written to `results/` as CSV, JSON, and Markdown, with pairs classified as:
