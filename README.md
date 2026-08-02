@@ -131,21 +131,33 @@ done
 
 ### Assigning risk directions from TWAS or S-PrediXcan output
 
-TRACE requires one direction per gene. Before running TRACE, users must assign each gene to either increased_gene_increases_risk or decreased_gene_increases_risk based on their TWAS or S-PrediXcan results. Here is how we recommend handling common scenarios:
+TRACE requires one direction per gene. Before running TRACE, users must assign each gene to either `increased_gene_increases_risk` or `decreased_gene_increases_risk` based on their TWAS or S-PrediXcan results.
 
-If your phenotype has multiple related traits (e.g. systolic vs diastolic blood pressure):
+---
+
+**If your phenotype has multiple related traits (e.g. systolic vs diastolic blood pressure):**
+
 Run TRACE separately for each trait. A gene may have opposing effects depending on the trait, and pooling across traits will produce incorrect direction assignments.
 
-If you have colocalization results (recommended):
+---
 
-Identify the tissue with the highest colocalization posterior probability (PP4) that exceeds your threshold (e.g. PP4 > 0.60). Use that tissue's S-PrediXcan effect estimate sign to assign direction — a positive beta means increased_gene_increases_risk and a negative beta means decreased_gene_increases_risk.
-If colocalization is similar across tissues, use the most biologically relevant tissue for your trait (e.g. aorta or heart for blood pressure, uterus for endometriosis).
-If effects are split across tissues and no tissue has a colocalization posterior probability above your threshold (e.g. PP4 > 0.60), exclude the gene and flag it for manual review.
+**If you have colocalization results (recommended):**
 
-If you do not have colocalization results:
-Assign direction based on the majority effect sign across tissues from your S-PrediXcan output. If the majority of significant tissues show a positive beta, assign increased_gene_increases_risk. If the majority show a negative beta, assign decreased_gene_increases_risk. Genes with an equal split should be excluded.
+1. Identify the tissue with the highest colocalization posterior probability (PP4) that exceeds your threshold (e.g. PP4 > 0.60). Use that tissue's S-PrediXcan effect estimate sign to assign direction — a positive beta means `increased_gene_increases_risk` and a negative beta means `decreased_gene_increases_risk`.
+2. If colocalization is similar across tissues, use the most biologically relevant tissue for your trait (e.g. aorta or heart for blood pressure, uterus for endometriosis).
+3. If effects are split across tissues and no tissue has a PP4 above your threshold, exclude the gene and flag it for manual review.
 
-Note that without colocalization support, some TWAS signals may reflect linkage disequilibrium rather than true causal gene expression effects. Candidates generated from genes without colocalization support should be interpreted with extra caution and prioritized below those with strong colocalization evidence.
+---
+
+**If you do not have colocalization results:**
+
+- Assign direction based on the majority effect sign across tissues from your S-PrediXcan output.
+- If the majority of significant tissues show a positive beta, assign `increased_gene_increases_risk`.
+- If the majority show a negative beta, assign `decreased_gene_increases_risk`.
+- Genes with an equal split should be excluded.
+
+> Note: Without colocalization support, some TWAS signals may reflect linkage disequilibrium rather than true causal gene expression effects. Candidates generated from genes without colocalization support should be interpreted with extra caution.
+
 
 
 ### Output
