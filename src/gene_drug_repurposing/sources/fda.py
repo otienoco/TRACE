@@ -27,20 +27,28 @@ def check_fda_approval(drug_name: str) -> DrugRecord:
     return record
 
 def _query_openfda(drug_name):
-    for q in [f'openfda.generic_name:"{drug_name}"', f'openfda.brand_name:"{drug_name}"']:
-        try:
-            resp = requests.get(f"{config.OPENFDA_BASE_URL}/label.json",
-                                params={"search": q, "limit": 1}, timeout=15)
-            if resp.status_code == 200:
-                results = resp.json().get("results", [])
-                if results:
-                    openfda = results[0].get("openfda", {})
-                    generic = openfda.get("generic_name", [])
-                    brands  = openfda.get("brand_name", [])
-                    return {"generic_name": generic[0].lower() if generic else drug_name,
-                            "brand_names": [b.title() for b in brands]}
-        except Exception as e:
-            print(f"[fda] openFDA error: {e}")
+    try:
+        resp = requests.get(
+            f"{config.OPENFDA_BASE_URL.replace('/drug', '')}/drug/drugsfda.json",
+            params={"search": f'openfda.generic_name:"{drug_name}"', "limit": 1},
+            timeout=15
+        )
+        if resp.status_code == 200:
+            results = resp.json().get("results", [])
+            if results:
+                products = results[0].get("products", [{}])
+                marketing_status = products[0].get("marketing_status", "").lower()
+                if marketing_status not in {"prescription", "otc"}:
+                    return None
+                openfda = results[0].get("openfda", {})
+                generic = openfda.get("generic_name", [])
+                brands = openfda.get("brand_name", [])
+                return {
+                    "generic_name": generic[0].lower() if generic else drug_name,
+                    "brand_names": [b.title() for b in brands]
+                }
+    except Exception as e:
+        print(f"[fda] openFDA error: {e}")
     return None
 
 def _query_rxnorm(drug_name):
